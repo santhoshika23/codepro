@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Staff Dashboard</title>
+    <script>
+        function fetchStaffTimetable() {
+            fetch('/generate_weekly_timetable', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                let staffName = "{{ name }}";  // Logged-in staff's name
+                let tableContent = "";
+
+                for (let day in data) {
+                    let daySchedule = data[day].filter(entry => entry.staff_name === staffName);
+                    if (daySchedule.length > 0) {
+                        tableContent += `<tr><th colspan="2">${day}</th></tr>`;
+                        daySchedule.forEach((entry, index) => {
+                            tableContent += `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${entry.subject}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+                }
+                document.getElementById("timetable-body").innerHTML = tableContent || "<tr><td colspan='2'>No assignments</td></tr>";
+            })
+            .catch(error => console.error('Error fetching timetable:', error));
+        }
+    </script>
+</head>
+<body onload="fetchStaffTimetable()">
+    <h2>Welcome, {{ name }}</h2>
+
+    <h3>Your Weekly Timetable</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Period</th>
+                <th>Subject</th>
+            </tr>
+        </thead>
+        <tbody id="timetable-body">
+            <!-- Staff's timetable data will be populated here -->
+        </tbody>
+    </table>
+
+    <br><a href="/logout">Logout</a>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <script>
+        function fetchTimetable() {
+            fetch('/generate_weekly_timetable', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                let tableContent = "";
+                for (let day in data) {
+                    tableContent += `<tr><th colspan="3">${day}</th></tr>`;
+                    data[day].forEach((entry, index) => {
+                        tableContent += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${entry.staff_name}</td>
+                                <td>${entry.subject}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                document.getElementById("timetable-body").innerHTML = tableContent;
+            })
+            .catch(error => console.error('Error fetching timetable:', error));
+        }
+    </script>
+</head>
+<body onload="fetchTimetable()">
+    <h2>Welcome, Admin</h2>
+
+    <h3>Add Staff</h3>
+    <form action="/add_staff" method="post">
+        <input type="text" name="name" placeholder="Name" required><br>
+        <input type="email" name="email" placeholder="Email" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <input type="text" name="contact" placeholder="Contact Info" required><br>
+        <button type="submit">Add Staff</button>
+    </form>
+
+    <h3>Weekly Timetable</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Period</th>
+                <th>Staff</th>
+                <th>Subject</th>
+            </tr>
+        </thead>
+        <tbody id="timetable-body">
+            <!-- Timetable data will be populated here -->
+        </tbody>
+    </table>
+
+    <br><a href="/logout">Logout</a>
+</body>
+</html>
